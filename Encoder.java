@@ -97,14 +97,11 @@ public class Encoder {
 
             //Get the colour data for the current pixel
             Color originalPixelColour = new Color(image.getRGB(xPixelPointer, yPixelPointer));
-            int originalRedInt = originalPixelColour.getRed();
-            int originalGreenInt = originalPixelColour.getGreen();
-            int originalBlueInt = originalPixelColour.getBlue();
 
             //Initialise the new colour data to the old colour data
-            int newRedInt = originalRedInt;
-            int newGreenInt = originalGreenInt;
-            int newBlueInt = originalBlueInt;           
+            int newRedInt = originalPixelColour.getRed();
+            int newGreenInt = originalPixelColour.getGreen();
+            int newBlueInt = originalPixelColour.getBlue();        
 
             //If statements are used to stop writing once payload is written
             if(((payload.length()-1)-payloadPointer)>=0){
