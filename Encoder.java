@@ -30,20 +30,34 @@ public class Encoder {
         return binaryMessage.toString();
     }
 
+    //Adds the header to the payload, header is a binary int of how large the payload is
+    //This header is defined to be as large as the largest possible payload
+    private static String addHeader(String noHeaderPayload, BufferedImage photo){
+        
+        int maximumPayloadSize = photo.getWidth()*photo.getHeight()*3;
+        int headerSize = (Integer.toBinaryString(maximumPayloadSize)).length();
+        
+        String payloadSizeBinaryString = Integer.toBinaryString(noHeaderPayload.length());
+        String header = String.format("%" + headerSize + "s", payloadSizeBinaryString).replace(' ', '0');
+
+        return (header + noHeaderPayload);
+    }
+
 
     //Basic Read image method, could change in future
-    private static BufferedImage readImage(){
+    private static BufferedImage readImage(String imageName){
 
         BufferedImage payloadImg = null;
         
         try{
-        payloadImg = ImageIO.read( new File("test.png"));
+        payloadImg = ImageIO.read( new File(imageName));
         } catch(IOException e){
             e.printStackTrace();
         }
         return payloadImg;
     }  
 
+    //Quick function mainly to clean up the insert payload function
     private static String replaceLastChar(String text, char newLastChar){
         String removeLastChar = text.substring(0,text.length()-1);
         return (removeLastChar+ newLastChar);
