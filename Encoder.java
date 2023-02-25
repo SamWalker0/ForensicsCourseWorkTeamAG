@@ -10,6 +10,7 @@ public class Encoder {
     public static void main(String[] Args){
 
 
+
     }
 
     //Takes a string and returns the ascii bit representation for each character 
@@ -32,9 +33,9 @@ public class Encoder {
 
     //Adds the header to the payload, header is a binary int of how large the payload is
     //This header is defined to be as large as the largest possible payload
-    private static String addHeader(String noHeaderPayload, BufferedImage photo){
+    private static String addHeader(String noHeaderPayload, BufferedImage image){
         
-        int maximumPayloadSize = photo.getWidth()*photo.getHeight()*3;
+        int maximumPayloadSize = image.getWidth()*image.getHeight()*3;
         int headerSize = (Integer.toBinaryString(maximumPayloadSize)).length();
         
         String payloadSizeBinaryString = Integer.toBinaryString(noHeaderPayload.length());
@@ -63,9 +64,19 @@ public class Encoder {
         return (removeLastChar+ newLastChar);
     }
 
+    //Writes the new image to the file
+    private static void writeImageToFile(BufferedImage image, String newFileName){
+        
+        try{
+            File outputFile = new File(newFileName);
+            ImageIO.write(image, "png", outputFile);
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
 
     //Payload inserted into the image
-    private static BufferedImage insertPayload(String payload, BufferedImage photo){
+    private static BufferedImage insertPayload(String payload, BufferedImage image){
 
         int payloadPointer = 0;
         int bitPackageCount = (int)Math.ceil(payload.length()/3);
@@ -78,14 +89,14 @@ public class Encoder {
         // there is then the special case at the end for the last package that might not contain 3 bits of data
         for(int packageIterator=0; packageIterator<=bitPackageCount; packageIterator++){
 
-            //Checks if the x pixel falls past the photo size
-            if(xPixelPointer>=photo.getWidth()){
+            //Checks if the x pixel falls past the image size
+            if(xPixelPointer>=image.getWidth()){
                 xPixelPointer=0;
                 yPixelPointer++;
             }
 
             //Get the colour data for the current pixel
-            Color originalPixelColour = new Color(photo.getRGB(xPixelPointer, yPixelPointer));
+            Color originalPixelColour = new Color(image.getRGB(xPixelPointer, yPixelPointer));
             int originalRedInt = originalPixelColour.getRed();
             int originalGreenInt = originalPixelColour.getGreen();
             int originalBlueInt = originalPixelColour.getBlue();
@@ -123,11 +134,11 @@ public class Encoder {
             
             Color newColour = new Color(newRedInt, newBlueInt, newGreenInt);
 
-            photo.setRGB(xPixelPointer, yPixelPointer, newColour.getRGB());
+            image.setRGB(xPixelPointer, yPixelPointer, newColour.getRGB());
 
             xPixelPointer++;
         }
-    return photo;
+    return image;
     }
 
 } 
