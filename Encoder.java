@@ -9,14 +9,7 @@ public class Encoder {
 
     public static void main(String[] Args){
 
-        BufferedImage image =  readImage("test.png");
-        String bitmessage = stringToBytes("Hello my name is Sam");
 
-        String payload = addHeader(bitmessage, image);
-
-        BufferedImage newImage = insertPayload(payload, image);
-
-        writeImageToFile(newImage, "final.png");
     }
 
     //Takes a string and returns the ascii bit representation for each character 
@@ -45,6 +38,7 @@ public class Encoder {
         int headerSize = (Integer.toBinaryString(maximumPayloadSize)).length();
         
         String payloadSizeBinaryString = Integer.toBinaryString(noHeaderPayload.length());
+
         String header = String.format("%" + headerSize + "s", payloadSizeBinaryString).replace(' ', '0');
 
         return (header + noHeaderPayload);

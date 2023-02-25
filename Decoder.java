@@ -10,9 +10,6 @@ public class Decoder{
     
     public static void main(String[] Args){
 
-        BufferedImage image = readImage("final.png");
-        String decodedMessage = decodeImageToBits(image);
-        System.out.println(decodedMessage);
     }
 
 
@@ -97,7 +94,6 @@ public class Decoder{
             }
             bitPointer++;
             
-
             xPixelPointer++;
         }
 
@@ -106,7 +102,7 @@ public class Decoder{
 
         int payloadPackages = (int)Math.ceil(payloadSize/3);
 
-        for(int payloadPackageIterator = 0; payloadPackageIterator < payloadPackages; payloadPackageIterator++){
+        for(int payloadPackageIterator = 0; payloadPackageIterator <= payloadPackages; payloadPackageIterator++){
             
             if(xPixelPointer>=image.getWidth()){
                 xPixelPointer=0;
@@ -115,12 +111,15 @@ public class Decoder{
 
             Color pixelColour = new Color(image.getRGB(xPixelPointer, yPixelPointer));
 
-            if( ((headerSize+payloadSize)-1) - bitPointer >=0 ){
+            if( (((headerSize+payloadSize)-1) - bitPointer ) >=0 ){
                 payloadBuilder = appendLSB(payloadBuilder, pixelColour, "red");
+                bitPointer++;
             } if( ((headerSize+payloadSize)-1) - bitPointer >=0 ){
                 payloadBuilder = appendLSB(payloadBuilder, pixelColour, "green");
+                bitPointer++;
             } if( ((headerSize+payloadSize)-1) - bitPointer >=0 ){
                 payloadBuilder = appendLSB(payloadBuilder, pixelColour, "blue");
+                bitPointer++;
             }
 
             xPixelPointer++;
