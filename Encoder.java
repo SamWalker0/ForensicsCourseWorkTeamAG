@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.text.StyledEditorKit.BoldAction;
+import java.util.Arrays;
+import java.util.List;
 
 import java.lang.Math;
 import java.util.Scanner;
@@ -15,11 +17,13 @@ public class Encoder {
 
         Scanner inputScanner = new Scanner(System.in);
 
-        File imageFile = getFileFromUser(inputScanner);
+        File imageFile = getFileFromUser(inputScanner,".png");
         BufferedImage originalImage = readImage(imageFile);
 
         //String message = getSecretMessageFromPrompt(originalImage,inputScanner);
-        String message = getPayloadFromFile(originalImage);
+        
+        File payloadFile = getFileFromUser(inputScanner,".txt");
+        String message = getPayloadFromFile(originalImage, payloadFile);
 
         String noHeaderPayload = stringToBytes(message);
         String payload = addHeader(noHeaderPayload, originalImage);
@@ -30,7 +34,7 @@ public class Encoder {
         inputScanner.close();
     }
 
-    private static String getPayloadFromFile(BufferedImage image){
+    private static String getPayloadFromFile(BufferedImage image, File payloadFile){
         
         int maximumPayloadSize = image.getWidth()*image.getHeight()*3;
         int headerSize = (Integer.toBinaryString(maximumPayloadSize)).length();
@@ -38,8 +42,7 @@ public class Encoder {
 
         StringBuilder payloadBuilder = new StringBuilder();
         try{
-            File payloadtxt = new File("message.txt");
-            Scanner reader = new Scanner(payloadtxt);
+            Scanner reader = new Scanner(payloadFile);
             while(reader.hasNextLine()){
                 payloadBuilder.append(reader.nextLine()+"\n");
             }
@@ -57,7 +60,7 @@ public class Encoder {
         return payloadBuilder.toString();
     }
 
-    private static File getFileFromUser(Scanner userFileScanner){
+    private static File getFileFromUser(Scanner inputScanner, String fileFormat){
 
         File allFilesInDir[];
         File folder = new File(System.getProperty("user.dir"));
@@ -71,13 +74,13 @@ public class Encoder {
             System.out.println("\n\nEnter the filename to encode the message into, below are the possible files:\n");
 
             for(File filename : allFilesInDir){
-                if(filename.getName().contains(".png")||filename.getName().contains(".bmp")||filename.getName().contains(".gif")){
+                if(filename.getName().contains(fileFormat)){
                     System.out.print(filename.getName() + " | ");
                 }
             }
 
             System.out.println("\n\nEnter the filename:");
-            userFileStr = userFileScanner.nextLine();
+            userFileStr = inputScanner.nextLine();
             
             for(File currentFile : allFilesInDir){
                 if(currentFile.getName().equals(userFileStr)){
