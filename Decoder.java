@@ -11,14 +11,18 @@ public class Decoder{
     
     public static void main(String[] Args){
 
-        File encodedFile = getFileFromUser();
+        Scanner inputScanner = new Scanner(System.in);
+
+        File encodedFile = getFileFromUser(inputScanner);
         BufferedImage encodedImage = readImage(encodedFile);
         String decodedMessage = decodeImage(encodedImage);
         
         System.out.println("Below is the decoded message:\n\n" + decodedMessage);
+
+        inputScanner.close();
     }
 
-    private static File getFileFromUser(){
+    private static File getFileFromUser(Scanner userFileScanner){
 
         File allFilesInDir[];
         File folder = new File(System.getProperty("user.dir"));
@@ -26,7 +30,6 @@ public class Decoder{
 
         boolean validInput = false;
         File userFile = null;
-        Scanner userFileScanner = new Scanner(System.in);
         String userFileStr;
 
         while(!validInput){
@@ -56,7 +59,6 @@ public class Decoder{
                                     "______________________________________________________________________________");
             }
         }
-        userFileScanner.close();
 
         return userFile;
     }

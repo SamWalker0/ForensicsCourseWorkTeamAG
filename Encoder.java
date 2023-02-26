@@ -3,6 +3,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.text.StyledEditorKit.BoldAction;
+
 import java.lang.Math;
 import java.util.Scanner;
 
@@ -10,56 +12,85 @@ public class Encoder {
 
     public static void main(String[] Args){
 
-        File imageFile = getFileFromUser();
+        Scanner inputScanner = new Scanner(System.in);
+
+        File imageFile = getFileFromUser(inputScanner);
         BufferedImage originalImage = readImage(imageFile);
-        String message = getSecretMessage(originalImage);
+        String message = getSecretMessage(originalImage,inputScanner);
         String noHeaderPayload = stringToBytes(message);
         String payload = addHeader(noHeaderPayload, originalImage);
         BufferedImage encodedImage = insertPayload(payload, originalImage);
         writeImageToFile(encodedImage, imageFile);
         System.out.println("Message Successfully Encoded");
+
+        inputScanner.close();
     }
 
-    private static File getFileFromUser(){
+    private static File getFileFromUser(Scanner userFileScanner){
 
         File allFilesInDir[];
         File folder = new File(System.getProperty("user.dir"));
         allFilesInDir = folder.listFiles();
 
-        System.out.println("\n\nEnter the filename to encode the message to, below are the possible files:\n");
-
-        for(File filename : allFilesInDir){
-            if(filename.getName().contains(".png")){
-                System.out.print(filename.getName() + " | ");
-            }
-        }
-
-        System.out.println("\n\nEnter the filename:");
-
-        Scanner userFileScanner = new Scanner(System.in);
-        String userFileStr = userFileScanner.nextLine();
-
+        boolean validInput = false;
         File userFile = null;
-        for(File currentFile : allFilesInDir){
-            if(currentFile.getName().equals(userFileStr)){
-                userFile = currentFile;
+        String userFileStr;
+
+        while(!validInput){
+            System.out.println("\n\nEnter the filename to encode the message into, below are the possible files:\n");
+
+            for(File filename : allFilesInDir){
+                if(filename.getName().contains(".png")){
+                    System.out.print(filename.getName() + " | ");
+                }
+            }
+
+            System.out.println("\n\nEnter the filename:");
+            userFileStr = userFileScanner.nextLine();
+            
+            for(File currentFile : allFilesInDir){
+                if(currentFile.getName().equals(userFileStr)){
+                    userFile = currentFile;
+                    validInput = true;
+                }
+            }
+            if(userFileStr.equals("exit")){
+                System.exit(0);
+            }
+            if(!validInput){
+                System.out.println("\n______________________________________________________________________________"+
+                                    "\nINVALID INPUT: Please enter a valid full filename, or exit to exit the program\n"+
+                                    "______________________________________________________________________________");
             }
         }
 
         return userFile;
     }
 
-    private static String getSecretMessage(BufferedImage image){
+    private static String getSecretMessage(BufferedImage image, Scanner secretMessageScanner){
 
         int maximumPayloadSize = image.getWidth()*image.getHeight()*3;
         int headerSize = (Integer.toBinaryString(maximumPayloadSize)).length();
         int maxPayloadCharacters = (maximumPayloadSize - headerSize)/8;
 
-        System.out.println("\nEnter your secret Message\nSecret message character length: " + maxPayloadCharacters +
-            ", this is approximately " + (maxPayloadCharacters/6) +" words\n\n");
+        boolean encodedMessageFitsPayload = false;
+        String secretMessage="";
         
-        Scanner secretMessageScanner = new Scanner(System.in);
-        String secretMessage = secretMessageScanner.nextLine();       
+        while(!encodedMessageFitsPayload){
+            System.out.println("\nEnter your secret Message\nSecret message character length: " + maxPayloadCharacters +
+                                ", this is approximately " + (maxPayloadCharacters/6) +" words");
+            
+            secretMessage = secretMessageScanner.nextLine(); 
+
+            if(secretMessage.length()>maxPayloadCharacters){
+                System.out.println("\n______________________________________________________________________________________________________________"+
+                                    "\nPAYLOAD TOO LARGE: Your entered will not fit the image " + 
+                                    "either shorten payload or start again with a larger image" +
+                                    "\n_____________________________________________________________________________________________________________");
+            } else{
+                encodedMessageFitsPayload = true;
+            }
+        }
 
         return secretMessage;
     }
