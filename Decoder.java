@@ -4,12 +4,47 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.lang.Math;
+import java.util.Scanner;
 
 public class Decoder{
 
     
     public static void main(String[] Args){
 
+        File encodedFile = getFileFromUser();
+        BufferedImage encodedImage = readImage(encodedFile);
+        String decodedMessage = decodeImage(encodedImage);
+        
+        System.out.println("Below is the decoded message:\n\n" + decodedMessage);
+    }
+
+    private static File getFileFromUser(){
+
+        File allFilesInDir[];
+        File folder = new File(System.getProperty("user.dir"));
+        allFilesInDir = folder.listFiles();
+
+        System.out.println("\n\nEnter the filename to decode the message from, below are the possible files:\n");
+
+        for(File filename : allFilesInDir){
+            if(filename.getName().contains(".png")){
+                System.out.print(filename.getName() + " | ");
+            }
+        }
+
+        System.out.println("\n\nEnter the filename:");
+
+        Scanner userFileScanner = new Scanner(System.in);
+        String userFileStr = userFileScanner.nextLine();
+
+        File userFile = null;
+        for(File currentFile : allFilesInDir){
+            if(currentFile.getName().equals(userFileStr)){
+                userFile = currentFile;
+            }
+        }
+
+        return userFile;
     }
 
 
@@ -32,12 +67,12 @@ public class Decoder{
     }
 
 
-    private static BufferedImage readImage(String imageName){
+    private static BufferedImage readImage(File imageFile){
 
         BufferedImage payloadImg = null;
         
         try{
-        payloadImg = ImageIO.read( new File(imageName));
+        payloadImg = ImageIO.read(imageFile);
         } catch(IOException e){
             e.printStackTrace();
         }
@@ -50,7 +85,7 @@ public class Decoder{
         return headerBitSize;
     }
 
-    private static String decodeImageToBits(BufferedImage image){
+    private static String decodeImage(BufferedImage image){
 
         int headerSize = findHeaderSize(image);
 
@@ -130,8 +165,6 @@ public class Decoder{
         
         return decodedMessage;
     }
-
-    
 
     private static StringBuilder appendLSB (StringBuilder text, Color pixelColour, String colourIdentifier){
 
