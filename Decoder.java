@@ -24,25 +24,39 @@ public class Decoder{
         File folder = new File(System.getProperty("user.dir"));
         allFilesInDir = folder.listFiles();
 
-        System.out.println("\n\nEnter the filename to decode the message from, below are the possible files:\n");
-
-        for(File filename : allFilesInDir){
-            if(filename.getName().contains(".png")){
-                System.out.print(filename.getName() + " | ");
-            }
-        }
-
-        System.out.println("\n\nEnter the filename:");
-
-        Scanner userFileScanner = new Scanner(System.in);
-        String userFileStr = userFileScanner.nextLine();
-
+        boolean validInput = false;
         File userFile = null;
-        for(File currentFile : allFilesInDir){
-            if(currentFile.getName().equals(userFileStr)){
-                userFile = currentFile;
+        Scanner userFileScanner = new Scanner(System.in);
+        String userFileStr;
+
+        while(!validInput){
+            System.out.println("\n\nEnter the filename to decode the message from, below are the possible files:\n");
+
+            for(File filename : allFilesInDir){
+                if(filename.getName().contains(".png")){
+                    System.out.print(filename.getName() + " | ");
+                }
+            }
+
+            System.out.println("\n\nEnter the filename:");
+            userFileStr = userFileScanner.nextLine();
+            
+            for(File currentFile : allFilesInDir){
+                if(currentFile.getName().equals(userFileStr)){
+                    userFile = currentFile;
+                    validInput = true;
+                }
+            }
+            if(userFileStr.equals("exit")){
+                System.exit(0);
+            }
+            if(!validInput){
+                System.out.println("\n______________________________________________________________________________"+
+                                    "\nINVALID INPUT: Please enter a valid full filename, or exit to exit the program\n"+
+                                    "______________________________________________________________________________");
             }
         }
+        userFileScanner.close();
 
         return userFile;
     }
