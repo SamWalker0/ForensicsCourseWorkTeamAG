@@ -7,7 +7,6 @@ import java.lang.Math;
 import java.util.Scanner;
 
 public class Decoder{
-
     
     public static void main(String[] Args){
 
@@ -36,7 +35,7 @@ public class Decoder{
             System.out.println("\n\nEnter the filename to decode the message from, below are the possible files:\n");
 
             for(File filename : allFilesInDir){
-                if(filename.getName().contains(".png")){
+                if(filename.getName().contains(".png")||filename.getName().contains(".bmp")||filename.getName().contains(".gif")){
                     System.out.print(filename.getName() + " | ");
                 }
             }
@@ -59,26 +58,20 @@ public class Decoder{
                                     "______________________________________________________________________________");
             }
         }
-
         return userFile;
     }
 
-
     //Given a bit string returns a String of the decoded message
     private static String bytesToString(String bytesMessage){
-
 
         String[] characterByte = bytesMessage.split("(?<=\\G.{8})");
         StringBuilder decodedMessage = new StringBuilder();
 
         for (String by : characterByte){   
-
             int tempInt = Integer.parseInt(by, 2);
             char c = (char)tempInt;
             decodedMessage.append(c);
-
         }
-
         return decodedMessage.toString();
     }
 
@@ -172,13 +165,9 @@ public class Decoder{
                 payloadBuilder = appendLSB(payloadBuilder, pixelColour, "blue");
                 bitPointer++;
             }
-
             xPixelPointer++;
-
         }
-
-        String decodedMessage = bytesToString(payloadBuilder.toString());
-        
+        String decodedMessage = bytesToString(payloadBuilder.toString());       
         return decodedMessage;
     }
 
@@ -198,5 +187,5 @@ public class Decoder{
         }
         return text.append(binaryStr.charAt(binaryStr.length() - 1));
     }
-
+    
 }

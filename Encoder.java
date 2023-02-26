@@ -40,7 +40,7 @@ public class Encoder {
             System.out.println("\n\nEnter the filename to encode the message into, below are the possible files:\n");
 
             for(File filename : allFilesInDir){
-                if(filename.getName().contains(".png")){
+                if(filename.getName().contains(".png")||filename.getName().contains(".bmp")||filename.getName().contains(".gif")){
                     System.out.print(filename.getName() + " | ");
                 }
             }
@@ -63,7 +63,6 @@ public class Encoder {
                                     "______________________________________________________________________________");
             }
         }
-
         return userFile;
     }
 
@@ -91,26 +90,22 @@ public class Encoder {
                 encodedMessageFitsPayload = true;
             }
         }
-
         return secretMessage;
     }
 
 
-    //Takes a string and returns the ascii bit representation for each character 
+    //Takes a string and returns the ascii bit representation for each character
     private static String stringToBytes(String message){
         
         char[] chs = message.toCharArray();
         StringBuilder binaryMessage = new StringBuilder();
 
         for(char ch : chs){
-
             binaryMessage.append(
                 String.format("%8s", Integer.toBinaryString(ch))
                 .replaceAll(" ","0")  
                 );
-
         }
-
         return binaryMessage.toString();
     }
 
@@ -166,7 +161,6 @@ public class Encoder {
         int xPixelPointer = 0;
         int yPixelPointer = 0;
         
-
         //The payload insertion is done in 3 bit packages for the RGB values,
         // there is then the special case at the end for the last package that might not contain 3 bits of data
         for(int packageIterator=0; packageIterator<=bitPackageCount; packageIterator++){
