@@ -4,13 +4,66 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.lang.Math;
+import java.util.Scanner;
 
 public class Encoder {
 
     public static void main(String[] Args){
 
-
+        File imageFile = getFileFromUser();
+        BufferedImage originalImage = readImage(imageFile);
+        String message = getSecretMessage(originalImage);
+        String noHeaderPayload = stringToBytes(message);
+        String payload = addHeader(noHeaderPayload, originalImage);
+        BufferedImage encodedImage = insertPayload(payload, originalImage);
+        writeImageToFile(encodedImage, imageFile);
+        System.out.println("Message Successfully Encoded");
     }
+
+    private static File getFileFromUser(){
+
+        File allFilesInDir[];
+        File folder = new File(System.getProperty("user.dir"));
+        allFilesInDir = folder.listFiles();
+
+        System.out.println("\n\nEnter the filename to encode the message to, below are the possible files:\n");
+
+        for(File filename : allFilesInDir){
+            if(filename.getName().contains(".png")){
+                System.out.print(filename.getName() + " | ");
+            }
+        }
+
+        System.out.println("\n\nEnter the filename:");
+
+        Scanner userFileScanner = new Scanner(System.in);
+        String userFileStr = userFileScanner.nextLine();
+
+        File userFile = null;
+        for(File currentFile : allFilesInDir){
+            if(currentFile.getName().equals(userFileStr)){
+                userFile = currentFile;
+            }
+        }
+
+        return userFile;
+    }
+
+    private static String getSecretMessage(BufferedImage image){
+
+        int maximumPayloadSize = image.getWidth()*image.getHeight()*3;
+        int headerSize = (Integer.toBinaryString(maximumPayloadSize)).length();
+        int maxPayloadCharacters = (maximumPayloadSize - headerSize)/8;
+
+        System.out.println("\nEnter your secret Message\nSecret message character length: " + maxPayloadCharacters +
+            ", this is approximately " + (maxPayloadCharacters/6) +" words\n\n");
+        
+        Scanner secretMessageScanner = new Scanner(System.in);
+        String secretMessage = secretMessageScanner.nextLine();       
+
+        return secretMessage;
+    }
+
 
     //Takes a string and returns the ascii bit representation for each character 
     private static String stringToBytes(String message){
@@ -44,14 +97,13 @@ public class Encoder {
         return (header + noHeaderPayload);
     }
 
-
     //Basic Read image method, could change in future
-    private static BufferedImage readImage(String imageName){
+    private static BufferedImage readImage(File imageFile){
 
         BufferedImage payloadImg = null;
         
         try{
-        payloadImg = ImageIO.read( new File(imageName));
+        payloadImg = ImageIO.read(imageFile);
         } catch(IOException e){
             e.printStackTrace();
         }
@@ -65,11 +117,10 @@ public class Encoder {
     }
 
     //Writes the new image to the file
-    private static void writeImageToFile(BufferedImage image, String newFileName){
+    private static void writeImageToFile(BufferedImage image, File writeFile){
         
         try{
-            File outputFile = new File(newFileName);
-            ImageIO.write(image, "png", outputFile);
+            ImageIO.write(image, "png", writeFile);
         } catch (IOException e){
             e.printStackTrace();
         }
