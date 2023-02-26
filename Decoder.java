@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.lang.Math;
@@ -15,10 +16,21 @@ public class Decoder{
         File encodedFile = getFileFromUser(inputScanner);
         BufferedImage encodedImage = readImage(encodedFile);
         String decodedMessage = decodeImage(encodedImage);
-        
-        System.out.println("Below is the decoded message:\n\n" + decodedMessage);
+        printMessageToFile(decodedMessage);
+        System.out.println("Message decoded to file.");
 
         inputScanner.close();
+    }
+
+    private static void printMessageToFile(String message){
+        try{
+            FileWriter fileWriter = new FileWriter("DecodedMessage.txt");
+            fileWriter.write(message);
+            fileWriter.close();
+          } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
     private static File getFileFromUser(Scanner userFileScanner){
@@ -187,5 +199,5 @@ public class Decoder{
         }
         return text.append(binaryStr.charAt(binaryStr.length() - 1));
     }
-    
+
 }

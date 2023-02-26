@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.text.StyledEditorKit.BoldAction;
@@ -16,7 +17,10 @@ public class Encoder {
 
         File imageFile = getFileFromUser(inputScanner);
         BufferedImage originalImage = readImage(imageFile);
-        String message = getSecretMessage(originalImage,inputScanner);
+
+        //String message = getSecretMessageFromPrompt(originalImage,inputScanner);
+        String message = getPayloadFromFile(originalImage);
+
         String noHeaderPayload = stringToBytes(message);
         String payload = addHeader(noHeaderPayload, originalImage);
         BufferedImage encodedImage = insertPayload(payload, originalImage);
@@ -24,6 +28,33 @@ public class Encoder {
         System.out.println("Message Successfully Encoded");
 
         inputScanner.close();
+    }
+
+    private static String getPayloadFromFile(BufferedImage image){
+        
+        int maximumPayloadSize = image.getWidth()*image.getHeight()*3;
+        int headerSize = (Integer.toBinaryString(maximumPayloadSize)).length();
+        int maxPayloadCharacters = (maximumPayloadSize - headerSize)/8;
+
+        StringBuilder payloadBuilder = new StringBuilder();
+        try{
+            File payloadtxt = new File("message.txt");
+            Scanner reader = new Scanner(payloadtxt);
+            while(reader.hasNextLine()){
+                payloadBuilder.append(reader.nextLine()+"\n");
+            }
+
+        } catch(FileNotFoundException e){
+            System.out.println("file does not exist");
+        }
+
+        if(payloadBuilder.toString().length()>(maxPayloadCharacters/6)){
+            System.out.println("ERROR: Payload Size too large");
+            System.exit(0);
+        }
+        
+
+        return payloadBuilder.toString();
     }
 
     private static File getFileFromUser(Scanner userFileScanner){
@@ -65,34 +96,6 @@ public class Encoder {
         }
         return userFile;
     }
-
-    private static String getSecretMessage(BufferedImage image, Scanner secretMessageScanner){
-
-        int maximumPayloadSize = image.getWidth()*image.getHeight()*3;
-        int headerSize = (Integer.toBinaryString(maximumPayloadSize)).length();
-        int maxPayloadCharacters = (maximumPayloadSize - headerSize)/8;
-
-        boolean encodedMessageFitsPayload = false;
-        String secretMessage="";
-        
-        while(!encodedMessageFitsPayload){
-            System.out.println("\nEnter your secret Message\nSecret message character length: " + maxPayloadCharacters +
-                                ", this is approximately " + (maxPayloadCharacters/6) +" words");
-            
-            secretMessage = secretMessageScanner.nextLine(); 
-
-            if(secretMessage.length()>maxPayloadCharacters){
-                System.out.println("\n______________________________________________________________________________________________________________"+
-                                    "\nPAYLOAD TOO LARGE: Your entered will not fit the image " + 
-                                    "either shorten payload or start again with a larger image" +
-                                    "\n_____________________________________________________________________________________________________________");
-            } else{
-                encodedMessageFitsPayload = true;
-            }
-        }
-        return secretMessage;
-    }
-
 
     //Takes a string and returns the ascii bit representation for each character
     private static String stringToBytes(String message){
@@ -213,5 +216,34 @@ public class Encoder {
         }
     return image;
     }
+    /*
+    Deprecated method that took message from prompt, it broke when pasting in data
 
+    private static String getSecretMessageFromPrompt(BufferedImage image, Scanner secretMessageScanner){
+
+        int maximumPayloadSize = image.getWidth()*image.getHeight()*3;
+        int headerSize = (Integer.toBinaryString(maximumPayloadSize)).length();
+        int maxPayloadCharacters = (maximumPayloadSize - headerSize)/8;
+
+        boolean encodedMessageFitsPayload = false;
+        String secretMessage="";
+        
+        while(!encodedMessageFitsPayload){
+            System.out.println("\nEnter your secret Message\nSecret message character length: " + maxPayloadCharacters +
+                                ", this is approximately " + (maxPayloadCharacters/6) +" words");
+            
+            secretMessage = secretMessageScanner.nextLine(); 
+
+            if(secretMessage.length()>maxPayloadCharacters){
+                System.out.println("\n______________________________________________________________________________________________________________"+
+                                    "\nPAYLOAD TOO LARGE: Your entered will not fit the image " + 
+                                    "either shorten payload or start again with a larger image" +
+                                    "\n_____________________________________________________________________________________________________________");
+            } else{
+                encodedMessageFitsPayload = true;
+            }
+        }
+        return secretMessage;
+    }
+    */
 } 
