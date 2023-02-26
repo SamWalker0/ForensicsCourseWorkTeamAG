@@ -23,8 +23,11 @@ public class Decoder{
     }
 
     private static void printMessageToFile(String message){
+
+        File textFile = new File(System.getProperty("user.dir")+File.separator+"DecodedMessage.txt");
+
         try{
-            FileWriter fileWriter = new FileWriter("DecodedMessage.txt");
+            FileWriter fileWriter = new FileWriter(textFile);
             fileWriter.write(message);
             fileWriter.close();
           } catch (IOException e) {
