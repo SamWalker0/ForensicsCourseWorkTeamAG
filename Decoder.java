@@ -50,7 +50,7 @@ public class Decoder{
             System.out.println("\n\nEnter the filename to decode the message from, below are the possible files:\n");
 
             for(File filename : allFilesInDir){
-                if(filename.getName().contains(".png")||filename.getName().contains(".bmp")||filename.getName().contains(".gif")){
+                if(filename.getName().contains(".png")){
                     System.out.print(filename.getName() + " | ");
                 }
             }
