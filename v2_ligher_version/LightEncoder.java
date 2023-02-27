@@ -94,25 +94,19 @@ public class LightEncoder {
         int xPixelPointer = 0;
         int yPixelPointer = 0;
         
-        //The payload insertion is done in 3 bit packages for the RGB values,
-        // there is then the special case at the end for the last package that might not contain 3 bits of data
         for(int packageIterator=0; packageIterator<=bitPackageCount; packageIterator++){
 
-            //Checks if the x pixel falls past the image size
             if(xPixelPointer>=image.getWidth()){
                 xPixelPointer=0;
                 yPixelPointer++;
             }
 
-            //Get the colour data for the current pixel
             Color originalPixelColour = new Color(image.getRGB(xPixelPointer, yPixelPointer));
 
-            //Initialise the new colour data to the old colour data
             int newRedInt = originalPixelColour.getRed();
             int newGreenInt = originalPixelColour.getGreen();
             int newBlueInt = originalPixelColour.getBlue();        
 
-            //If statements are used to stop writing once payload is written
             if(((payload.length()-1)-payloadPointer)>=0){
 
                 String redBinaryRep = Integer.toBinaryString(originalPixelColour.getRed());
