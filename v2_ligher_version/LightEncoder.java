@@ -13,13 +13,13 @@ public class LightEncoder {
 
         Scanner inputScanner = new Scanner(System.in);
 
-        System.out.println("\n\nEnter the image filename:");
+        System.out.println("\nEnter the image filename:");
         String userFileStr = inputScanner.nextLine();
 
         File imageFile = new File(userFileStr);
         BufferedImage image = getImageData(imageFile);
 
-        System.out.println("\n\nEnter the payload filename:");
+        System.out.println("\nEnter the payload filename:");
         String payloadFileStr = inputScanner.nextLine();
 
         File payloadFile = new File(payloadFileStr);     
@@ -35,7 +35,7 @@ public class LightEncoder {
             e.printStackTrace();
         }
 
-        System.out.println("Message Successfully Encoded");
+        System.out.println("\nMessage Successfully Encoded");
 
         inputScanner.close();
     }
