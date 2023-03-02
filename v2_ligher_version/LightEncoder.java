@@ -6,6 +6,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.lang.Math;
 import java.util.Scanner;
+import java.util.Set;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 public class LightEncoder {
 
@@ -50,18 +53,37 @@ public class LightEncoder {
         return payloadImg;
     }
 
-    private static String getpayloadData(File imageFile){
+    private static String getpayloadData(File payloadFile){
+
         StringBuilder payloadBuilder = new StringBuilder();
-        try{
-            Scanner reader = new Scanner(imageFile);
-            while(reader.hasNextLine()){
-                payloadBuilder.append(reader.nextLine()+"\n");
-            }
-            reader.close();
-        } catch(FileNotFoundException e){
-            System.out.println("file does not exist");
-        }     
-        return payloadBuilder.toString();
+
+        //now using buffered reader since scanners were having issues
+        BufferedReader br = null;
+        try {
+           br = new BufferedReader(new FileReader(payloadFile));
+           String available;
+           while((available = br.readLine()) != null) {
+                payloadBuilder.append(available+"\n");            
+           }
+        } catch (FileNotFoundException e) {
+           e.printStackTrace();
+        } catch (IOException e) {
+           e.printStackTrace();
+        } finally {
+           if (br != null) {
+              try {
+                 br.close();
+              } catch (IOException e) {
+                 e.printStackTrace();
+              }
+           }
+        }
+
+        //removes non ascii characters
+        String payloadtoString = payloadBuilder.toString();
+        String onlyAsciiPayload = payloadtoString.replaceAll("[^\\x00-\\x7F]", "");
+        return onlyAsciiPayload;
+
     }
 
     private static String messageToPayloadWithHeader(String message){
@@ -75,9 +97,10 @@ public class LightEncoder {
                 );
         }
         String noHeaderPayload = binaryMessage.toString();
-        String payloadSizeBinaryString = Integer.toBinaryString(noHeaderPayload.length());       
+        String payloadSizeBinaryString = Integer.toBinaryString(noHeaderPayload.length()); 
+        System.out.println(payloadSizeBinaryString);      
         String header = String.format("%" + 25 + "s", payloadSizeBinaryString).replace(' ', '0');
-
+        System.out.println(header);
         return (header + noHeaderPayload);
     }
     
